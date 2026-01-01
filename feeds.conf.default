@@ -19,3 +19,15 @@ src-git small https://github.com/kenzok8/small;main
 src-git helloworld https://github.com/fw876/helloworld
 src-git openclash https://github.com/vernesong/OpenClash
 #src-git adguardhome https://github.com/rufengsuixing/luci-app-adguardhome
+#高级设置
+advancedplus https://github.com/sirpdboy/luci-app-advancedplus
+#网络测速插件-支持 Speedtest 测试
+netspeedtest https://github.com/sirpdboy/luci-app-netspeedtest
+#分区扩容插件
+partexp https://github.com/sirpdboy/luci-app-partexp
+#TurboACC 网络加速器（集成BBR、shortcut）
+TurboACC https://github.com/wukongdaily/store/tree/master/run/x86/luci-app-turboacc
+#高性能 DNS 分流器，支持 DoH/DoQ 等
+mosdns https://github.com/sbwml/luci-app-mosdns
+nekobox https://github.com/Thaolga/openwrt-nekobox
+nikki https://github.com/nikkinikki-org/OpenWrt-nikki
