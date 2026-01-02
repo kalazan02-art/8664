@@ -17,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Step 2: Free disk space early
+      # Step 2: Free disk space
       - name: Free disk space
         run: |
           sudo rm -rf /usr/share/dotnet \
@@ -64,24 +64,24 @@ jobs:
         run: |
           cd openwrt
           cat > .config << 'EOF'
-  CONFIG_TARGET_rockchip=y
-  CONFIG_TARGET_rockchip_armv8=y
-  CONFIG_TARGET_rockchip_armv8_DEVICE_friendlyarm_nanopi-r2s=y
+CONFIG_TARGET_rockchip=y
+CONFIG_TARGET_rockchip_armv8=y
+CONFIG_TARGET_rockchip_armv8_DEVICE_friendlyarm_nanopi-r2s=y
 
-  CONFIG_PACKAGE_luci=y
-  CONFIG_PACKAGE_luci-base=y
-  CONFIG_PACKAGE_luci-ssl=y
+CONFIG_PACKAGE_luci=y
+CONFIG_PACKAGE_luci-base=y
+CONFIG_PACKAGE_luci-ssl=y
 
-  CONFIG_PACKAGE_ppp=y
-  CONFIG_PACKAGE_ppp-mod-pppoe=y
-  CONFIG_PACKAGE_dnsmasq-full=y
-  CONFIG_PACKAGE_ipv6helper=y
+CONFIG_PACKAGE_ppp=y
+CONFIG_PACKAGE_ppp-mod-pppoe=y
+CONFIG_PACKAGE_dnsmasq-full=y
+CONFIG_PACKAGE_ipv6helper=y
 
-  CONFIG_PACKAGE_kmod-usb-net=y
-  CONFIG_PACKAGE_kmod-usb-net-rtl8152=y
+CONFIG_PACKAGE_kmod-usb-net=y
+CONFIG_PACKAGE_kmod-usb-net-rtl8152=y
 
-  CONFIG_TARGET_ROOTFS_PARTSIZE=256
-  EOF
+CONFIG_TARGET_ROOTFS_PARTSIZE=256
+EOF
           make defconfig
 
       # Step 8: Download packages
