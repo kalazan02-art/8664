@@ -36,6 +36,13 @@ jobs:
           rsync unzip zlib1g-dev file wget
         sudo apt-get clean
 
+    # ②b 安装 Python elftools（修复 u-boot binman 错误）
+    - name: Install Python elftools
+      run: |
+        python3 -m pip install --user pyelftools
+        export PATH=$HOME/.local/bin:$PATH
+        python3 -c "import elftools; print('elftools ok')"
+
     # ③ 使用 /mnt 作为 OpenWrt 工作目录
     - name: Clone OpenWrt to /mnt
       run: |
@@ -57,55 +64,17 @@ jobs:
       run: |
         cd openwrt
         cat > .config << 'EOF'
-        CONFIG_TARGET_rockchip=y
-        CONFIG_TARGET_rockchip_armv8=y
-        CONFIG_TARGET_rockchip_armv8_DEVICE_friendlyarm_nanopi-r2s=y
+CONFIG_TARGET_rockchip=y
+CONFIG_TARGET_rockchip_armv8=y
+CONFIG_TARGET_rockchip_armv8_DEVICE_friendlyarm_nanopi-r2s=y
 
-        CONFIG_PACKAGE_luci=y
-        CONFIG_PACKAGE_luci-base=y
-        CONFIG_PACKAGE_luci-ssl=y
+CONFIG_PACKAGE_luci=y
+CONFIG_PACKAGE_luci-base=y
+CONFIG_PACKAGE_luci-ssl=y
 
-        CONFIG_PACKAGE_ppp=y
-        CONFIG_PACKAGE_ppp-mod-pppoe=y
-        CONFIG_PACKAGE_dnsmasq-full=y
-        CONFIG_PACKAGE_ipv6helper=y
+CONFIG_PACKAGE_ppp=y
+CONFIG_PACKAGE_ppp-mod-pppoe=y
+CONFIG_PACKAGE_dnsmasq-full=y
+CONFIG_PACKAGE_ipv6helper=y
 
-        CONFIG_PACKAGE_kmod-usb-net=y
-        CONFIG_PACKAGE_kmod-usb-net-rtl8152=y
-
-        CONFIG_TARGET_ROOTFS_PARTSIZE=256
-        EOF
-
-        make defconfig
-
-    # ⑥ 下载源码（限制并发）
-    - name: Download packages
-      run: |
-        cd openwrt
-        make download -j2
-        find dl -size -1024c -delete
-
-    # ⑦ 编译（不 clean）
-    - name: Compile firmware
-      run: |
-        cd openwrt
-        make -j2 || make -j1 V=s
-
-    # ⑧ 只保留最终固件
-    - name: Prepare firmware
-      run: |
-        cd openwrt/bin/targets/*/*
-        rm -rf packages
-        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-
-    # ⑨ 发布到 Release
-    - name: Upload firmware to release
-      uses: softprops/action-gh-release@v0.1.14
-      with:
-        tag_name: r2s-${{ github.run_number }}
-        name: NanoPi R2S OpenWrt
-        body: Minimal OpenWrt firmware for NanoPi R2S
-        files: ${{ env.FIRMWARE }}/*
-        token: ${{ secrets.GITHUB_TOKEN }}
-        draft: false
-        prerelease: false
+CON
