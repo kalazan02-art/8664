@@ -1,4 +1,4 @@
-name: OpenWrt Builder (Low Disk)
+name: r2s (Low Disk)
 
 on:
   workflow_dispatch:
