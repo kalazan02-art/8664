@@ -26,7 +26,7 @@ src-git netspeedtest https://github.com/sirpdboy/luci-app-netspeedtest
 #分区扩容插件
 src-git partexp https://github.com/sirpdboy/luci-app-partexp
 #TurboACC 网络加速器（集成BBR、shortcut）
-src-git TurboACC https://github.com/wukongdaily/store/tree/master/run/x86/luci-app-turboacc
+#src-git TurboACC https://github.com/wukongdaily/store/tree/master/run/x86/luci-app-turboacc
 #高性能 DNS 分流器，支持 DoH/DoQ 等
 src-git mosdns https://github.com/sbwml/luci-app-mosdns
 src-git nekobox https://github.com/Thaolga/openwrt-nekobox
