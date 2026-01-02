@@ -1,0 +1,104 @@
+name: OpenWrt Builder (Low Disk)
+
+on:
+  workflow_dispatch:
+
+env:
+  REPO_URL: https://github.com/coolsnowwolf/lede   # 官方源码
+  REPO_BRANCH: master
+  FEEDS_CONF: feeds.conf.default
+  CONFIG_FILE: .config
+  DIY_P1_SH: diy-part1.sh
+  DIY_P2_SH: diy-part2.sh
+  UPLOAD_BIN_DIR: false
+  UPLOAD_FIRMWARE: true
+  UPLOAD_RELEASE: true
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Initialization environment
+      run: |
+        sudo apt-get -qq update
+        sudo apt-get -qq install -y \
+          build-essential asciidoc binutils bzip2 gawk gettext git \
+          libncurses5-dev libz-dev patch python3 python3-pip unzip \
+          zlib1g-dev lib32gcc-s1 libc6-dev-i386 subversion flex \
+          uglifyjs gcc-multilib p7zip-full msmtp libssl-dev texinfo \
+          libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf \
+          automake libtool autopoint device-tree-compiler ccache \
+          xsltproc rename antlr3 gperf wget curl swig rsync
+        sudo apt-get -qq autoremove --purge
+        sudo apt-get -qq clean
+
+    - name: Clone source code
+      run: |
+        git clone --depth=1 $REPO_URL -b $REPO_BRANCH openwrt
+        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        chmod +x $DIY_P1_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P1_SH
+
+    - name: Free disk space
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo docker image prune -af
+        df -h
+
+    - name: Update feeds (only required feeds)
+      run: |
+        cd openwrt
+        ./scripts/feeds update -a
+        # 只安装你需要的 feeds，避免安装所有插件
+        ./scripts/feeds install -a -p luci
+        ./scripts/feeds install -a -p packages
+
+    - name: Load custom configuration
+      run: |
+        cd openwrt
+        [ -e $GITHUB_WORKSPACE/$CONFIG_FILE ] && mv $GITHUB_WORKSPACE/$CONFIG_FILE .config
+        make defconfig
+
+    - name: Default DIY package script
+      run: |
+        cd openwrt
+        chmod +x $GITHUB_WORKSPACE/$DIY_P2_SH
+        $GITHUB_WORKSPACE/$DIY_P2_SH
+
+    - name: Download packages
+      run: |
+        cd openwrt
+        make download -j2
+        find dl -size -1024c -exec rm -f {} \;
+
+    - name: Compile the firmware (low disk)
+      run: |
+        cd openwrt
+        make clean
+        echo "Compiling with 2 threads to save disk space"
+        make -j2 || make -j1 V=s
+
+    - name: Upload firmware
+      if: env.UPLOAD_FIRMWARE == 'true'
+      run: |
+        cd openwrt/bin/targets/*/*
+        rm -rf packages
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "status=success" >> $GITHUB_OUTPUT
+
+    - name: Release
+      uses: softprops/action-gh-release@v0.1.14
+      if: env.UPLOAD_RELEASE == 'true'
+      with:
+        tag_name: "firmware-${{ github.run_number }}"
+        body: "OpenWrt firmware build"
+        files: ${{ env.FIRMWARE }}/*
+        token: ${{ secrets.GITHUB_TOKEN }}
+        draft: false
+        prerelease: false
+        overwrite: true
