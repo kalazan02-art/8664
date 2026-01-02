@@ -12,8 +12,8 @@ src-git passwall https://github.com/xiaorouji/openwrt-passwall-packages;main
 src-git passwall_luci https://github.com/xiaorouji/openwrt-passwall;main
 
 # 常用插件集合
-src-git kenzo https://github.com/kenzok8/openwrt-packages;main
-src-git small https://github.com/kenzok8/small;main
+src-git kenzo https://github.com/kenzok8/openwrt-packages;master
+src-git small https://github.com/kenzok8/small;master
 
 # 可选源（已注释，按需启用）
 src-git helloworld https://github.com/fw876/helloworld
